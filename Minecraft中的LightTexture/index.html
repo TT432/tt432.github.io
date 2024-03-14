@@ -16,24 +16,21 @@
   <meta name="author" content="秦千久">
   <meta name="keywords" content="">
   
-    <meta name="description" content="作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？ 终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。   注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践本文仅适用于 IDEA，本人测试版本为 2023.1   添加变量先在 gradle.properties 中添加两个变量：  targetServerPath">
+    <meta name="description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Bukkit中构建后自动打开服务端">
-<meta property="og:url" content="http://tt432.github.io/Bukkit%E4%B8%AD%E6%9E%84%E5%BB%BA%E5%90%8E%E8%87%AA%E5%8A%A8%E6%89%93%E5%BC%80%E6%9C%8D%E5%8A%A1%E7%AB%AF/">
+<meta property="og:title" content="Minecraft中的LightTexture">
+<meta property="og:url" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/">
 <meta property="og:site_name" content="千久银窝">
-<meta property="og:description" content="作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？ 终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。   注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践本文仅适用于 IDEA，本人测试版本为 2023.1   添加变量先在 gradle.properties 中添加两个变量：  targetServerPath">
+<meta property="og:description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-06-27T08:56:54.000Z">
-<meta property="article:modified_time" content="2023-07-07T20:01:50.773Z">
+<meta property="article:published_time" content="2023-07-08T09:56:59.000Z">
+<meta property="article:modified_time" content="2023-07-08T15:09:32.726Z">
 <meta property="article:author" content="秦千久">
-<meta property="article:tag" content="Bukkit">
-<meta property="article:tag" content="Gradle">
-<meta property="article:tag" content="Plugin">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Bukkit中构建后自动打开服务端 - 千久银窝</title>
+  <title>Minecraft中的LightTexture - 千久银窝</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +196,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Bukkit中构建后自动打开服务端"></span>
+            <span id="subtitle" data-typed-text="Minecraft中的LightTexture"></span>
           
         </div>
 
@@ -210,8 +207,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-06-27 16:56" pubdate>
-          2023年6月27日 下午
+        <time datetime="2023-07-08 17:56" pubdate>
+          2023年7月8日 下午
         </time>
       </span>
     
@@ -222,7 +219,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.7k 字
+          1.2k 字
         
       </span>
     
@@ -233,7 +230,7 @@
         
         
         
-          32 分钟
+          10 分钟
         
       </span>
     
@@ -271,28 +268,21 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Bukkit中构建后自动打开服务端</h1>
+            <h1 style="display: none">Minecraft中的LightTexture</h1>
             
             
               <div class="markdown-body">
                 
-                <p>作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？</p>
-<p>终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。</p>
-<div class="alert alert-danger"><i class="fa fa-bug  float-left"></i>  <p>注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践<br>本文仅适用于 IDEA，本人测试版本为 2023.1</p>
-</div>
+                <p>我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。</p>
+<p>RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？</p>
+<p>2 是光照纹理</p>
+<p>在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影</p>
+<p>可以通过以下方式导出 lightmap：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Mod</span>.EventBusSubscriber(Dist.CLIENT)<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LightTextureDump</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> tick;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">notRender</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<br><br>    <span class="hljs-meta">@SubscribeEvent</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onEvent</span><span class="hljs-params">(RenderLevelStageEvent event)</span> &#123;<br>        <span class="hljs-keyword">if</span> (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL &amp;&amp; tick++ &gt; <span class="hljs-number">100</span> &amp;&amp; notRender) &#123;<br>            notRender = <span class="hljs-literal">false</span>;<br><br>            <span class="hljs-type">AbstractTexture</span> <span class="hljs-variable">lightMap</span> <span class="hljs-operator">=</span> Minecraft.getInstance().getTextureManager()<br>                    .getTexture(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ResourceLocation</span>(String.format(Locale.ROOT, <span class="hljs-string">&quot;dynamic/%s_%d&quot;</span>, <span class="hljs-string">&quot;light_map&quot;</span>, <span class="hljs-number">1</span>)));<br><br>            <span class="hljs-type">NativeImage</span> <span class="hljs-variable">ni</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeImage</span>(<span class="hljs-number">16</span>,<span class="hljs-number">16</span>, <span class="hljs-literal">false</span>);<br>            RenderSystem.bindTexture(lightMap.getId());<br><br>            ni.downloadTexture(<span class="hljs-number">0</span>, <span class="hljs-literal">true</span>);<br><br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-type">FileImageOutputStream</span> <span class="hljs-variable">fios</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileImageOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(<span class="hljs-string">&quot;./lightMap.png&quot;</span>));<br><br>                fios.write(ni.asByteArray());<br><br>                fios.close();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h2 id="添加变量"><a href="#添加变量" class="headerlink" title="添加变量"></a>添加变量</h2><p>先在 <code>gradle.properties</code> 中添加两个变量：</p>
-<ul>
-<li><code>targetServerPath</code>     : 服务端所在的文件夹，比如 <code>D:\Server</code></li>
-<li><code>targetServerJarName</code>  : 服务端的名称，比如 <code>xx-server.jar</code></li>
-</ul>
-<p>按照如上设置，本文提供的方法会查找 <code>D:\Server\xx-server.jar</code> 启动。</p>
-<h2 id="复制构建产物至目标服务端的插件文件夹"><a href="#复制构建产物至目标服务端的插件文件夹" class="headerlink" title="复制构建产物至目标服务端的插件文件夹"></a>复制构建产物至目标服务端的插件文件夹</h2><p>在 <code>build.gradle</code> 中添加如下内容：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs groovy">tasks.register(<span class="hljs-string">&#x27;copyArtifacts&#x27;</span>, Copy) &#123;<br>    from <span class="hljs-string">&#x27;build/libs&#x27;</span><br>    into <span class="hljs-string">&quot;$&#123;targetServerPath&#125;/plugins/&quot;</span><br>    include <span class="hljs-string">&#x27;**/*.jar&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h2 id="生成-runServer-运行配置"><a href="#生成-runServer-运行配置" class="headerlink" title="生成 runServer 运行配置"></a>生成 runServer 运行配置</h2><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><code class="hljs groovy"><span class="hljs-keyword">import</span> javax.xml.parsers.DocumentBuilder<br><span class="hljs-keyword">import</span> javax.xml.parsers.DocumentBuilderFactory<br><span class="hljs-keyword">import</span> javax.xml.transform.TransformerException<br><span class="hljs-keyword">import</span> javax.xml.transform.TransformerFactory<br><span class="hljs-keyword">import</span> javax.xml.transform.dom.DOMSource<br><span class="hljs-keyword">import</span> javax.xml.transform.stream.StreamResult<br><br><span class="hljs-keyword">static</span> <span class="hljs-type">void</span> createOption(document, parent, String name, String value) &#123;<br>    <span class="hljs-keyword">final</span> var option = document.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>    option.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, name);<br>    option.setAttribute(<span class="hljs-string">&quot;value&quot;</span>, value);<br><br>    parent.appendChild(option)<br>&#125;<br><br>tasks.register(<span class="hljs-string">&#x27;createRunConfigurations&#x27;</span>) &#123;<br>    <span class="hljs-keyword">def</span> runConfigurationsDir = <span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;.idea/runConfigurations&quot;</span>)<br><br>    <span class="hljs-keyword">final</span> DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();<br>    <span class="hljs-keyword">final</span> DocumentBuilder docBuilder = docFactory.newDocumentBuilder();<br><br>    <span class="hljs-keyword">final</span> var javaDocument = docBuilder.newDocument();<br>    &#123;<br>        <span class="hljs-keyword">final</span> var rootElement = javaDocument.createElement(<span class="hljs-string">&quot;component&quot;</span>);<br>        &#123;<br>            <span class="hljs-keyword">final</span> var configuration = javaDocument.createElement(<span class="hljs-string">&quot;configuration&quot;</span>);<br>            &#123;<br>                configuration.setAttribute(<span class="hljs-string">&quot;default&quot;</span>, <span class="hljs-string">&quot;false&quot;</span>);<br>                configuration.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;runServer&quot;</span>);<br>                configuration.setAttribute(<span class="hljs-string">&quot;type&quot;</span>, <span class="hljs-string">&quot;JarApplication&quot;</span>)<br><br>                createOption(javaDocument, configuration, <span class="hljs-string">&quot;JAR_PATH&quot;</span>, <span class="hljs-string">&quot;$&#123;targetServerPath&#125;/$&#123;targetServerJarName&#125;&quot;</span>)<br>                createOption(javaDocument, configuration, <span class="hljs-string">&quot;WORKING_DIRECTORY&quot;</span>, targetServerPath)<br><br>                var method = javaDocument.createElement(<span class="hljs-string">&quot;method&quot;</span>);<br>                &#123;<br>                    method.setAttribute(<span class="hljs-string">&quot;v&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>)<br><br>                    var o1 = javaDocument.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>                    o1.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Gradle.BeforeRunTask&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;enabled&quot;</span>, <span class="hljs-string">&quot;true&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;tasks&quot;</span>, <span class="hljs-string">&quot;build&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;externalProjectPath&quot;</span>, <span class="hljs-string">&quot;\$PROJECT_DIR\$&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;vmOptions&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;scriptParameters&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br><br>                    method.appendChild(o1)<br><br>                    var o2 = javaDocument.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>                    o2.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Gradle.BeforeRunTask&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;enabled&quot;</span>, <span class="hljs-string">&quot;true&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;tasks&quot;</span>, <span class="hljs-string">&quot;copyArtifacts&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;externalProjectPath&quot;</span>, <span class="hljs-string">&quot;\$PROJECT_DIR\$&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;vmOptions&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;scriptParameters&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br><br>                    method.appendChild(o2)<br>                &#125;<br>                configuration.appendChild(method)<br>            &#125;<br>            rootElement.appendChild(configuration)<br>        &#125;<br>        javaDocument.appendChild(rootElement);<br>    &#125;<br><br>    <span class="hljs-keyword">final</span> TransformerFactory transformerFactory = TransformerFactory.newInstance();<br>    <span class="hljs-keyword">final</span> var transformer = transformerFactory.newTransformer();<br><br>    <span class="hljs-keyword">final</span> DOMSource source = <span class="hljs-keyword">new</span> DOMSource(javaDocument);<br>    <span class="hljs-keyword">final</span> File location = <span class="hljs-keyword">new</span> File(runConfigurationsDir, <span class="hljs-string">&quot;runServer.xml&quot;</span>);<br>    <span class="hljs-keyword">if</span> (!location.getParentFile().exists())<br>        location.getParentFile().mkdirs();<br>    <span class="hljs-keyword">final</span> StreamResult result = <span class="hljs-keyword">new</span> StreamResult(location);<br><br>    <span class="hljs-keyword">try</span> &#123;<br>        transformer.transform(source, result);<br>    &#125; <span class="hljs-keyword">catch</span> (TransformerException e) &#123;<br>        e.printStackTrace();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>该任务会生成一个 <code>JarApplication</code> 的配置文件，运行前会执行 <code>build</code> 与 <code>copyArtifacts</code> 两个 gradle 任务。</p>
+<p>lightMap 的纹理有 16 x 16，FULL_LIGHT 对应的坐标为 (15,15)。</p>
+<p>因此，若光照大于 FULL_LIGHT，则会出现各种问题，这取决于当前管线的着色器的行为。</p>
+<p>lightMap 的横轴为 block，纵轴为 sky，观察导出的 lightMap 可以看出，在 MC 原版的行为中，若方块光足够强则可以无视天光的影响。</p>
 
                 
               </div>
@@ -302,17 +292,6 @@
               <div class="post-metas my-3">
   
   
-    <div class="post-meta">
-      <i class="iconfont icon-tags"></i>
-      
-        <a href="/tags/Bukkit/">#Bukkit</a>
-      
-        <a href="/tags/Gradle/">#Gradle</a>
-      
-        <a href="/tags/Plugin/">#Plugin</a>
-      
-    </div>
-  
 </div>
 
 
@@ -321,8 +300,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Bukkit中构建后自动打开服务端</div>
-      <div>http://tt432.github.io/Bukkit中构建后自动打开服务端/</div>
+      <div>Minecraft中的LightTexture</div>
+      <div>http://tt432.github.io/Minecraft中的LightTexture/</div>
     </div>
     <div class="license-meta">
       
@@ -334,7 +313,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年6月27日</div>
+          <div>2023年7月8日</div>
         </div>
       
       
@@ -366,15 +345,21 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/MythicMobsSkill%E7%B3%BB%E7%BB%9F%E6%8B%86%E8%A7%A3/" title="MythicMobsSkill系统拆解">
+                      <a href="/%E6%8E%A2%E6%8E%A2%E7%B2%BE%E7%A5%9E%E9%9C%80%E6%B1%82%E5%9C%A8%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84%E4%BD%93%E7%8E%B0/" title="探探精神需求在游戏中的体现">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MythicMobsSkill系统拆解</span>
+                        <span class="hidden-mobile">探探精神需求在游戏中的体现</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E6%A2%B3%E7%90%86/" title="图形学梳理">
+                        <span class="hidden-mobile">图形学梳理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>

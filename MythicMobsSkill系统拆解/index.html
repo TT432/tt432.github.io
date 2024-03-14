@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="秦千久">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文不强调如何使用，而是从一个开发者的视角去尝试分析。   神话暴徒 MythicMobs 中，有一个较为重要的子系统为 Skill，本文将尝试拆解 Skill 系统。  技能由几个不同的部分组成：  Mechanics         机制 Effects         效果   Triggers          触发器 Targeters         目标选择器 Health Mo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MythicMobsSkill系统拆解">
+<meta property="og:url" content="http://tt432.github.io/MythicMobsSkill%E7%B3%BB%E7%BB%9F%E6%8B%86%E8%A7%A3/">
+<meta property="og:site_name" content="千久银窝">
+<meta property="og:description" content="本文不强调如何使用，而是从一个开发者的视角去尝试分析。   神话暴徒 MythicMobs 中，有一个较为重要的子系统为 Skill，本文将尝试拆解 Skill 系统。  技能由几个不同的部分组成：  Mechanics         机制 Effects         效果   Triggers          触发器 Targeters         目标选择器 Health Mo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-29T12:58:45.000Z">
+<meta property="article:modified_time" content="2023-07-07T22:58:19.071Z">
+<meta property="article:author" content="秦千久">
+<meta property="article:tag" content="Plugin">
+<meta property="article:tag" content="MythicMobs">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>MythicMobsSkill系统拆解 - 千久银窝</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"tt432.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>千久银窝</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MythicMobsSkill系统拆解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-06-29 20:58" pubdate>
+          2023年6月29日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          27 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MythicMobsSkill系统拆解</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <div class="alert alert-danger"><i class="fa fa-bug  float-left"></i>  <p>本文不强调如何使用，而是从一个开发者的视角去尝试分析。</p>
+</div>
+
+<p><del>神话暴徒</del> MythicMobs 中，有一个较为重要的子系统为 <code>Skill</code>，本文将尝试拆解 <code>Skill</code> 系统。</p>
+<hr>
+<p>技能由几个不同的部分组成：</p>
+<ul>
+<li>Mechanics         机制<ul>
+<li>Effects         效果</li>
+</ul>
+</li>
+<li>Triggers          触发器</li>
+<li>Targeters         目标选择器</li>
+<li>Health Modifiers  生命值修饰符</li>
+<li>Chance            几率</li>
+</ul>
+<p>官方在 wiki 中首先就给出了一个例子：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">Skills</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">ignite&#123;ticks=100&#125;</span> <span class="hljs-string">@target</span> <span class="hljs-string">~onAttack</span> <span class="hljs-string">&lt;50%</span> <span class="hljs-number">0.5</span><br></code></pre></td></tr></table></figure>
+
+<p>由此引入了第一部分：</p>
+<h2 id="Mechanics-——-机制"><a href="#Mechanics-——-机制" class="headerlink" title="Mechanics —— 机制"></a>Mechanics —— 机制</h2><p>同时也给出了标准语法：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">Skills</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">mechanic&#123;argument=value&#125;</span> <span class="hljs-string">@[targeter]</span> <span class="hljs-string">~on[trigger]</span> [<span class="hljs-string">health_modifier</span>] [<span class="hljs-string">chance</span>]<br></code></pre></td></tr></table></figure>
+
+<p>这里可以查到<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Mechanics">所有官方提供的 Mechanics</a> </p>
+<p>参数（argument）部分简单直接，<code>&#123;key1=value1;key2=value2&#125;</code>，机制部分就像是在调用一个函数，而参数等同于函数的参数。</p>
+<p>在 MythicMobs 4.12 后加入了技能参数功能，现在你自定义的函数可以加参数了（奇怪的说法），标准定义为在本该是 value 的位置替换为占位符 <code>&lt;skill.paramsName&gt;</code>。</p>
+<p>占位符的定义可以在<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Placeholders">这里</a>找到。</p>
+<p>举个例子，如果我有一个 Skill：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">SomeSkill:</span><br>    <span class="hljs-attr">Skills:</span><br>        <span class="hljs-bullet">-</span> <span class="hljs-string">ignite&#123;ticks=&lt;skill.tickParams&gt;&#125;</span> <span class="hljs-string">@target</span> <span class="hljs-string">~onAttack</span><br></code></pre></td></tr></table></figure>
+
+<p>那么调用它时就可以用 <code>skill:SomeSkill&#123;tickParams=50&#125;</code> 这样的方式，如果起了相同的参数名，则后面的会取代前面的。</p>
+<p>类似的，替换了技能的名称的部分为占位符的，被称为 <a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/skills/mechanics/variableskill">VariableSkill</a>。</p>
+<hr>
+<h3 id="Effcts-——-效果"><a href="#Effcts-——-效果" class="headerlink" title="Effcts —— 效果"></a>Effcts —— 效果</h3><p>效果像是特殊的机制，可以在<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/skills/effects/">这里</a>找到官方提供的内容。</p>
+<p>用法与机制一致，但专为特殊效果设计。</p>
+<hr>
+<h2 id="Targeters-——-目标选择器"><a href="#Targeters-——-目标选择器" class="headerlink" title="Targeters —— 目标选择器"></a>Targeters —— 目标选择器</h2><p>目标选择器是另一个实现技能的核心，当然了，没有目标的技能放来何用呢？</p>
+<p>可以看到，<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Targeters/">MythicMobs 原版的 Targets</a> 相当的多，足以覆盖大部分使用场景。</p>
+<p>目标选择器则以 <code>@</code> 开头。</p>
+<p>类似的，目标选择器也有参数，不再赘述。</p>
+<hr>
+<h2 id="Triggers-——-触发器"><a href="#Triggers-——-触发器" class="headerlink" title="Triggers —— 触发器"></a>Triggers —— 触发器</h2><p>触发器代表着技能触发的时机，也就是说，没有这个放不了。</p>
+<p>在<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Triggers">这里</a>可以找到原版触发器。</p>
+<p>触发器以 <code>~</code> 开头，通常是类似 <code>~onAttack</code> 的形式出现。</p>
+<p>这里有一个比较有意思的部分，目标选择器和触发器能够协同工作，比如 <code>@Trigger ~onInteract</code> 就代表着右键单击生物（与生物互动）的玩家将被点燃，因为他们是 <code>@Trigger</code>。</p>
+<hr>
+<h2 id="Health-Modifiers-——-生命值修饰符"><a href="#Health-Modifiers-——-生命值修饰符" class="headerlink" title="Health Modifiers —— 生命值修饰符"></a>Health Modifiers —— 生命值修饰符</h2><p>这部分是可选的。</p>
+<p>以 <code>&gt;</code>、<code>&lt;</code>、<code>=</code> 三个符号开头（竟然不支持 &gt;&#x3D; ？），后跟一个数字或区间，例如 <code>&gt;500</code> 就是在生物生命值大于五百情况下才触发，同理 <code>&lt;20%</code> 就是小于 20%，另外还有一个特殊的情况，<code>=30%-50%</code>，这意味着会在 30% 到 50% 之间触发。</p>
+<hr>
+<h2 id="Chance-——-几率"><a href="#Chance-——-几率" class="headerlink" title="Chance —— 几率"></a>Chance —— 几率</h2><p>这部分也是可选的。</p>
+<p>这部分也是技能定义中最后一部分了，这意味着技能释放成功的几率。</p>
+<p>1.0 对应着 100%，0.5 对应 50%。</p>
+<hr>
+<p>至此，单个技能的使用的部分结束。</p>
+<hr>
+<h2 id="MetaSkill-——-元技能"><a href="#MetaSkill-——-元技能" class="headerlink" title="MetaSkill —— 元技能"></a>MetaSkill —— 元技能</h2><p>语法如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">internal_skillname:</span><br>  <span class="hljs-attr">Cooldown:</span> [<span class="hljs-string">seconds</span>]<br>  <span class="hljs-attr">OnCooldownSkill:</span> [<span class="hljs-string">the</span> <span class="hljs-string">metaskill</span> <span class="hljs-string">to</span> <span class="hljs-string">execute</span> <span class="hljs-string">if</span> <span class="hljs-string">this</span> <span class="hljs-string">one</span> <span class="hljs-string">is</span> <span class="hljs-string">on</span> <span class="hljs-string">cooldown</span>]<br>  <span class="hljs-attr">CancelIfNoTargets:</span> [<span class="hljs-literal">true</span><span class="hljs-string">/false</span>]<br>  <span class="hljs-attr">Conditions:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition1</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition2</span><br>  <span class="hljs-attr">TargetConditions:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition3</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition4</span><br>  <span class="hljs-attr">TriggerConditions:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition5</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">condition6</span><br>  <span class="hljs-attr">Skills:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">mechanic1</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-string">mechanic2</span><br></code></pre></td></tr></table></figure>
+
+<p>internal_skillname 部分是元技能的标识符，唯一且不含空格，用于调用时的定位。</p>
+<p>Cooldown 就是冷却时间，可以使用占位符。</p>
+<p>技能通常从列表中的第一个执行到最后一个。如果使用元机制，其机制将在原始元技能的机制恢复执行之前执行。如果被调用的元技能中存在延迟，则原始元技能的机制将恢复执行，而被调用元技能中存在的机制将在延迟后执行。</p>
+<p>直接说起来有些抽象，<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Metaskills#skills">官网的例子</a>非常合适。</p>
+<p>而 Skills 部分不能有触发器，允许有目标选择器，当 MetaSkill 中一条 skill 未指定目标时，会继承来自于调用者的目标。</p>
+<hr>
+<h3 id="Conditions-——-条件"><a href="#Conditions-——-条件" class="headerlink" title="Conditions —— 条件"></a>Conditions —— 条件</h3><p>条件可以分为三种类型：</p>
+<ul>
+<li>实体条件（Entity Conditions）：这些条件检查实体的条件。</li>
+<li>位置条件（Location Conditions）：这些条件检查某个位置的条件。如果在定位实体时使用位置条件，它将检查实体位置的条件。</li>
+<li>比较条件（Compare conditions）：这些检查两个不同“事物”之间的某些条件。例如，如果目标位于角为两个坐标的立方体内，则“Cuboid”将返回true，而“StringEquals”将根据两个字符串是否匹配返回true或false。</li>
+</ul>
+<p>条件也可以在元技能中的三个不同位置使用：</p>
+<ul>
+<li>条件（Conditions）：此部分中的条件检查脚轮的条件或脚轮的位置。</li>
+<li>目标条件（TargetConditions）：此部分中的条件检查从技能的目标者继承的目标或目标位置的条件。</li>
+<li>触发条件（TriggerConditions）：此部分中的条件检查触发技能的实体的条件。</li>
+</ul>
+<p>格式：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">SkillName:</span><br>  <span class="hljs-attr">Conditions:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">condition</span> [<span class="hljs-string">variable</span>]<br>  <span class="hljs-attr">TargetConditions:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">condition</span> [<span class="hljs-string">variable</span>] [<span class="hljs-string">action</span>]<br>  <span class="hljs-attr">TriggerConditions:</span><br>    <span class="hljs-bullet">-</span> <span class="hljs-string">condition</span> [<span class="hljs-string">variable</span>] [<span class="hljs-string">action</span>] [<span class="hljs-string">action_variable</span>]<br>    <span class="hljs-bullet">-</span> <span class="hljs-string">condition&#123;variable1=value;variable2=value&#125;</span> [<span class="hljs-string">action</span>] [<span class="hljs-string">action_variable</span>]<br></code></pre></td></tr></table></figure>
+
+<p>条件中可以使用范围数字，<code>#to#</code> 或是 <code>#-#</code>，## 的位置为数字。</p>
+<p>条件可以用<code>或（||）</code>或者<code>与（&amp;&amp;）</code>运算符合并。</p>
+<p>action 部分指定了条件的行为：</p>
+<ul>
+<li>required (or true) ：符合条件运行</li>
+<li>cancel (or false) ：符合条件不运行</li>
+<li>power [multiplier] ：修改技能的功率</li>
+<li>cast [skill] ：符合条件则额外释放技能</li>
+<li>castinstead [skill] ：符合条件则改为释放其他技能</li>
+<li>orElseCast [skill] ：MM 4.12 新增，不符合条件则改为释放其他技能</li>
+</ul>
+<p>Premium 版中，给出了<a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/skills/conditions/in-linetargetconditions">一种方式</a>可以实现内联的条件，以实现更精细的条件管理，尽管普通版也可以使用 Skill 嵌套的方式实现，不过该种方式确实减少了一些需要书写的内容。</p>
+<hr>
+<h2 id="变量与数学运算"><a href="#变量与数学运算" class="headerlink" title="变量与数学运算"></a>变量与数学运算</h2><p><a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Variables">https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Variables</a></p>
+<p><a target="_blank" rel="noopener" href="https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Math">https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Math</a></p>
+<hr>
+<p>在我看来，MM Skill 的定义绝对算得上 DSL 的一种，像是这种 DSL，完全可以使用 <a target="_blank" rel="noopener" href="https://github.com/antlr/antlr4">Antlr</a> 来构建。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Plugin/">#Plugin</a>
+      
+        <a href="/tags/MythicMobs/">#MythicMobs</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MythicMobsSkill系统拆解</div>
+      <div>http://tt432.github.io/MythicMobsSkill系统拆解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>秦千久</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年6月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E6%A2%B3%E7%90%86/" title="图形学梳理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">图形学梳理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/Bukkit%E4%B8%AD%E6%9E%84%E5%BB%BA%E5%90%8E%E8%87%AA%E5%8A%A8%E6%89%93%E5%BC%80%E6%9C%8D%E5%8A%A1%E7%AB%AF/" title="Bukkit中构建后自动打开服务端">
+                        <span class="hidden-mobile">Bukkit中构建后自动打开服务端</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -16,24 +16,22 @@
   <meta name="author" content="秦千久">
   <meta name="keywords" content="">
   
-    <meta name="description" content="作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？ 终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。   注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践本文仅适用于 IDEA，本人测试版本为 2023.1   添加变量先在 gradle.properties 中添加两个变量：  targetServerPath">
+    <meta name="description" content="基础线代知识时至今日，各类工具使得人们不必再掌握全部的计算，相比计算，我想学习图形学需要更多几何直觉而不是计算方式。 向量点乘、叉乘矩阵变换模型、相机（视图）投影（正交、透视）视口光栅化采样信号学 反走样着色画家算法、z-buffer光照计算光照模型：Phong镜面反射出的光线与观察者视线的夹角。 改进的算法：入射与视线的半向量（归一化后的（入射 + 视线））与法线的夹角。 L &#x3D; La">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Bukkit中构建后自动打开服务端">
-<meta property="og:url" content="http://tt432.github.io/Bukkit%E4%B8%AD%E6%9E%84%E5%BB%BA%E5%90%8E%E8%87%AA%E5%8A%A8%E6%89%93%E5%BC%80%E6%9C%8D%E5%8A%A1%E7%AB%AF/">
+<meta property="og:title" content="图形学梳理">
+<meta property="og:url" content="http://tt432.github.io/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E6%A2%B3%E7%90%86/">
 <meta property="og:site_name" content="千久银窝">
-<meta property="og:description" content="作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？ 终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。   注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践本文仅适用于 IDEA，本人测试版本为 2023.1   添加变量先在 gradle.properties 中添加两个变量：  targetServerPath">
+<meta property="og:description" content="基础线代知识时至今日，各类工具使得人们不必再掌握全部的计算，相比计算，我想学习图形学需要更多几何直觉而不是计算方式。 向量点乘、叉乘矩阵变换模型、相机（视图）投影（正交、透视）视口光栅化采样信号学 反走样着色画家算法、z-buffer光照计算光照模型：Phong镜面反射出的光线与观察者视线的夹角。 改进的算法：入射与视线的半向量（归一化后的（入射 + 视线））与法线的夹角。 L &#x3D; La">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-06-27T08:56:54.000Z">
-<meta property="article:modified_time" content="2023-07-07T20:01:50.773Z">
+<meta property="article:published_time" content="2023-07-07T20:00:41.000Z">
+<meta property="article:modified_time" content="2023-07-09T08:31:07.994Z">
 <meta property="article:author" content="秦千久">
-<meta property="article:tag" content="Bukkit">
-<meta property="article:tag" content="Gradle">
-<meta property="article:tag" content="Plugin">
+<meta property="article:tag" content="Computer Graphics">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Bukkit中构建后自动打开服务端 - 千久银窝</title>
+  <title>图形学梳理 - 千久银窝</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +197,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Bukkit中构建后自动打开服务端"></span>
+            <span id="subtitle" data-typed-text="图形学梳理"></span>
           
         </div>
 
@@ -210,8 +208,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-06-27 16:56" pubdate>
-          2023年6月27日 下午
+        <time datetime="2023-07-08 04:00" pubdate>
+          2023年7月8日 凌晨
         </time>
       </span>
     
@@ -222,7 +220,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.7k 字
+          1.1k 字
         
       </span>
     
@@ -233,7 +231,7 @@
         
         
         
-          32 分钟
+          10 分钟
         
       </span>
     
@@ -271,29 +269,57 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Bukkit中构建后自动打开服务端</h1>
+            <h1 style="display: none">图形学梳理</h1>
             
             
               <div class="markdown-body">
                 
-                <p>作为一个 Mod 开发者，自开发插件以来，一直在想一个问题：为什么插件开发不能一键调试呢？</p>
-<p>终于，在一个风雨交加的夜晚，我忍无可忍，于是便有了本文。</p>
-<div class="alert alert-danger"><i class="fa fa-bug  float-left"></i>  <p>注意：由于本人 Gradle 水平堪比学前班，所以不建议将本文内容视为最佳实践<br>本文仅适用于 IDEA，本人测试版本为 2023.1</p>
-</div>
-
-<h2 id="添加变量"><a href="#添加变量" class="headerlink" title="添加变量"></a>添加变量</h2><p>先在 <code>gradle.properties</code> 中添加两个变量：</p>
+                <h2 id="基础线代知识"><a href="#基础线代知识" class="headerlink" title="基础线代知识"></a>基础线代知识</h2><p>时至今日，各类工具使得人们不必再掌握全部的计算，相比计算，我想学习图形学需要更多几何直觉而不是计算方式。</p>
+<h3 id="向量"><a href="#向量" class="headerlink" title="向量"></a>向量</h3><h4 id="点乘、叉乘"><a href="#点乘、叉乘" class="headerlink" title="点乘、叉乘"></a>点乘、叉乘</h4><h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><h2 id="变换"><a href="#变换" class="headerlink" title="变换"></a>变换</h2><h3 id="模型、相机（视图）"><a href="#模型、相机（视图）" class="headerlink" title="模型、相机（视图）"></a>模型、相机（视图）</h3><h3 id="投影（正交、透视）"><a href="#投影（正交、透视）" class="headerlink" title="投影（正交、透视）"></a>投影（正交、透视）</h3><h3 id="视口"><a href="#视口" class="headerlink" title="视口"></a>视口</h3><h2 id="光栅化"><a href="#光栅化" class="headerlink" title="光栅化"></a>光栅化</h2><h3 id="采样"><a href="#采样" class="headerlink" title="采样"></a>采样</h3><p>信号学</p>
+<h3 id="反走样"><a href="#反走样" class="headerlink" title="反走样"></a>反走样</h3><h2 id="着色"><a href="#着色" class="headerlink" title="着色"></a>着色</h2><h3 id="画家算法、z-buffer"><a href="#画家算法、z-buffer" class="headerlink" title="画家算法、z-buffer"></a>画家算法、z-buffer</h3><h3 id="光照计算"><a href="#光照计算" class="headerlink" title="光照计算"></a>光照计算</h3><h4 id="光照模型：Phong"><a href="#光照模型：Phong" class="headerlink" title="光照模型：Phong"></a>光照模型：Phong</h4><p>镜面反射出的光线与观察者视线的夹角。</p>
+<p>改进的算法：入射与视线的半向量（归一化后的（入射 + 视线））与法线的夹角。</p>
+<p>L &#x3D; La + Ld + Ls &#x3D; ka * Ia + kd * (I &#x2F; r^2) * max(0, n dot l) + ks (I &#x2F; r2) * max(0, n dot h) ^ p</p>
+<p>k 为漫反射系数（颜色），I 为光照强度，r 为测试点距离光照中心的距离，n 为法向量，l 为入射向量，h 为半向量，p 越大，高光越小。</p>
+<h4 id="光照频率：面、顶点、像素（Phong）"><a href="#光照频率：面、顶点、像素（Phong）" class="headerlink" title="光照频率：面、顶点、像素（Phong）"></a>光照频率：面、顶点、像素（Phong）</h4><p>Phong 英年早逝，实属可惜。</p>
+<p>顶点法线：附近面加权平均，面的面积越大权越大。</p>
+<p>面内的像素法线：重心坐标（下面讲）</p>
+<h3 id="实时渲染管线"><a href="#实时渲染管线" class="headerlink" title="实时渲染管线"></a>实时渲染管线</h3><p>一系列操作的过程叫做管线。</p>
+<p>顶点 -&gt; 顶点处理 </p>
+<p>-&gt; 屏幕空间顶点 -&gt; 三角处理 </p>
+<p>-&gt; 屏幕空间三角 -&gt; 光栅化 </p>
+<p>-&gt; 图元 -&gt; 图元处理 </p>
+<p>-&gt; 着色图元 -&gt; 帧缓冲操作 </p>
+<p>-&gt; 图像（像素数组）</p>
+<p>着色器（shader）：在可编程管线中，负责处理着色的东西</p>
+<h3 id="纹理映射"><a href="#纹理映射" class="headerlink" title="纹理映射"></a>纹理映射</h3><p>重心坐标：(a, b, c) 满足以下条件： (x, y) &#x3D; aA + bB + cC; a + b + c &#x3D; 1;<br>若点在三角形内，需要所有数都为非负的。</p>
+<h4 id="插值"><a href="#插值" class="headerlink" title="插值"></a>插值</h4><p>临近：寻找最近的纹理</p>
+<p>双线性（Bilinear）：取临近的四个进行线性插值</p>
+<p>双立方（Bicubic）：取临近的十六个进行三次插值</p>
+<h4 id="大尺寸纹理"><a href="#大尺寸纹理" class="headerlink" title="大尺寸纹理"></a>大尺寸纹理</h4><p>会导致采样率不足，单像素对应的点过多</p>
+<p>经典问题：点查询，范围查询问题（平均值）</p>
+<h4 id="Mipmap"><a href="#Mipmap" class="headerlink" title="Mipmap"></a>Mipmap</h4><p>Mipmap -&gt; 快速，非准确，正方形的范围查询。</p>
+<p>基本思想为提前进行多级的平均计算，增加的额外空间为 1&#x2F;3。</p>
 <ul>
-<li><code>targetServerPath</code>     : 服务端所在的文件夹，比如 <code>D:\Server</code></li>
-<li><code>targetServerJarName</code>  : 服务端的名称，比如 <code>xx-server.jar</code></li>
+<li>lv0 -&gt; 128x</li>
+<li>lv1 -&gt; 64x</li>
+<li>lv2 -&gt; 32x</li>
+<li>lv3 -&gt; 16x</li>
+<li>lv4 -&gt; 8x</li>
+<li>lv5 -&gt; 4x</li>
+<li>lv6 -&gt; 2x</li>
+<li>lv7 -&gt; 1x</li>
 </ul>
-<p>按照如上设置，本文提供的方法会查找 <code>D:\Server\xx-server.jar</code> 启动。</p>
-<h2 id="复制构建产物至目标服务端的插件文件夹"><a href="#复制构建产物至目标服务端的插件文件夹" class="headerlink" title="复制构建产物至目标服务端的插件文件夹"></a>复制构建产物至目标服务端的插件文件夹</h2><p>在 <code>build.gradle</code> 中添加如下内容：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs groovy">tasks.register(<span class="hljs-string">&#x27;copyArtifacts&#x27;</span>, Copy) &#123;<br>    from <span class="hljs-string">&#x27;build/libs&#x27;</span><br>    into <span class="hljs-string">&quot;$&#123;targetServerPath&#125;/plugins/&quot;</span><br>    include <span class="hljs-string">&#x27;**/*.jar&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h2 id="生成-runServer-运行配置"><a href="#生成-runServer-运行配置" class="headerlink" title="生成 runServer 运行配置"></a>生成 runServer 运行配置</h2><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><code class="hljs groovy"><span class="hljs-keyword">import</span> javax.xml.parsers.DocumentBuilder<br><span class="hljs-keyword">import</span> javax.xml.parsers.DocumentBuilderFactory<br><span class="hljs-keyword">import</span> javax.xml.transform.TransformerException<br><span class="hljs-keyword">import</span> javax.xml.transform.TransformerFactory<br><span class="hljs-keyword">import</span> javax.xml.transform.dom.DOMSource<br><span class="hljs-keyword">import</span> javax.xml.transform.stream.StreamResult<br><br><span class="hljs-keyword">static</span> <span class="hljs-type">void</span> createOption(document, parent, String name, String value) &#123;<br>    <span class="hljs-keyword">final</span> var option = document.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>    option.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, name);<br>    option.setAttribute(<span class="hljs-string">&quot;value&quot;</span>, value);<br><br>    parent.appendChild(option)<br>&#125;<br><br>tasks.register(<span class="hljs-string">&#x27;createRunConfigurations&#x27;</span>) &#123;<br>    <span class="hljs-keyword">def</span> runConfigurationsDir = <span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;.idea/runConfigurations&quot;</span>)<br><br>    <span class="hljs-keyword">final</span> DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();<br>    <span class="hljs-keyword">final</span> DocumentBuilder docBuilder = docFactory.newDocumentBuilder();<br><br>    <span class="hljs-keyword">final</span> var javaDocument = docBuilder.newDocument();<br>    &#123;<br>        <span class="hljs-keyword">final</span> var rootElement = javaDocument.createElement(<span class="hljs-string">&quot;component&quot;</span>);<br>        &#123;<br>            <span class="hljs-keyword">final</span> var configuration = javaDocument.createElement(<span class="hljs-string">&quot;configuration&quot;</span>);<br>            &#123;<br>                configuration.setAttribute(<span class="hljs-string">&quot;default&quot;</span>, <span class="hljs-string">&quot;false&quot;</span>);<br>                configuration.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;runServer&quot;</span>);<br>                configuration.setAttribute(<span class="hljs-string">&quot;type&quot;</span>, <span class="hljs-string">&quot;JarApplication&quot;</span>)<br><br>                createOption(javaDocument, configuration, <span class="hljs-string">&quot;JAR_PATH&quot;</span>, <span class="hljs-string">&quot;$&#123;targetServerPath&#125;/$&#123;targetServerJarName&#125;&quot;</span>)<br>                createOption(javaDocument, configuration, <span class="hljs-string">&quot;WORKING_DIRECTORY&quot;</span>, targetServerPath)<br><br>                var method = javaDocument.createElement(<span class="hljs-string">&quot;method&quot;</span>);<br>                &#123;<br>                    method.setAttribute(<span class="hljs-string">&quot;v&quot;</span>, <span class="hljs-string">&quot;1&quot;</span>)<br><br>                    var o1 = javaDocument.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>                    o1.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Gradle.BeforeRunTask&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;enabled&quot;</span>, <span class="hljs-string">&quot;true&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;tasks&quot;</span>, <span class="hljs-string">&quot;build&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;externalProjectPath&quot;</span>, <span class="hljs-string">&quot;\$PROJECT_DIR\$&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;vmOptions&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>                    o1.setAttribute(<span class="hljs-string">&quot;scriptParameters&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br><br>                    method.appendChild(o1)<br><br>                    var o2 = javaDocument.createElement(<span class="hljs-string">&quot;option&quot;</span>);<br><br>                    o2.setAttribute(<span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;Gradle.BeforeRunTask&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;enabled&quot;</span>, <span class="hljs-string">&quot;true&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;tasks&quot;</span>, <span class="hljs-string">&quot;copyArtifacts&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;externalProjectPath&quot;</span>, <span class="hljs-string">&quot;\$PROJECT_DIR\$&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;vmOptions&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br>                    o2.setAttribute(<span class="hljs-string">&quot;scriptParameters&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)<br><br>                    method.appendChild(o2)<br>                &#125;<br>                configuration.appendChild(method)<br>            &#125;<br>            rootElement.appendChild(configuration)<br>        &#125;<br>        javaDocument.appendChild(rootElement);<br>    &#125;<br><br>    <span class="hljs-keyword">final</span> TransformerFactory transformerFactory = TransformerFactory.newInstance();<br>    <span class="hljs-keyword">final</span> var transformer = transformerFactory.newTransformer();<br><br>    <span class="hljs-keyword">final</span> DOMSource source = <span class="hljs-keyword">new</span> DOMSource(javaDocument);<br>    <span class="hljs-keyword">final</span> File location = <span class="hljs-keyword">new</span> File(runConfigurationsDir, <span class="hljs-string">&quot;runServer.xml&quot;</span>);<br>    <span class="hljs-keyword">if</span> (!location.getParentFile().exists())<br>        location.getParentFile().mkdirs();<br>    <span class="hljs-keyword">final</span> StreamResult result = <span class="hljs-keyword">new</span> StreamResult(location);<br><br>    <span class="hljs-keyword">try</span> &#123;<br>        transformer.transform(source, result);<br>    &#125; <span class="hljs-keyword">catch</span> (TransformerException e) &#123;<br>        e.printStackTrace();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>该任务会生成一个 <code>JarApplication</code> 的配置文件，运行前会执行 <code>build</code> 与 <code>copyArtifacts</code> 两个 gradle 任务。</p>
-
+<p>总共有 log2 层，每层是上层的一半。</p>
+<p>mipmap D 与 D+1 之间进行三线性插值（Trilinear）：D 进行一次双线性，D + 1 进行一次，他们的结果进行一次。</p>
+<p>mipmap 的问题：会出现 overblur，远处细节丢失</p>
+<h4 id="各向异性过滤"><a href="#各向异性过滤" class="headerlink" title="各向异性过滤"></a>各向异性过滤</h4><p>生成 Ripmap，允许对长条形区域进行查询</p>
+<p>相比 mipmap 解决长条问题，但未解决斜着的问题。开销增加为 3x</p>
+<h4 id="EWA-过滤"><a href="#EWA-过滤" class="headerlink" title="EWA 过滤"></a>EWA 过滤</h4><h2 id="几何"><a href="#几何" class="headerlink" title="几何"></a>几何</h2><h3 id="环境光（可以用纹理表达）"><a href="#环境光（可以用纹理表达）" class="headerlink" title="环境光（可以用纹理表达）"></a>环境光（可以用纹理表达）</h3><p>球形环境光</p>
+<p>球形图 问题：展开会扭曲</p>
+<p>立方图 球映射到包围他的立方体</p>
+<h3 id="法线贴图"><a href="#法线贴图" class="headerlink" title="法线贴图"></a>法线贴图</h3><p>调光照</p>
+<h3 id="位移贴图"><a href="#位移贴图" class="headerlink" title="位移贴图"></a>位移贴图</h3><p>调顶点</p>
+<h3 id="几何分类"><a href="#几何分类" class="headerlink" title="几何分类"></a>几何分类</h3><h4 id="隐式"><a href="#隐式" class="headerlink" title="隐式"></a>隐式</h4><h5 id="距离函数"><a href="#距离函数" class="headerlink" title="距离函数"></a>距离函数</h5><h6 id="水平集"><a href="#水平集" class="headerlink" title="水平集"></a>水平集</h6><h5 id="分型"><a href="#分型" class="headerlink" title="分型"></a>分型</h5><h4 id="显式"><a href="#显式" class="headerlink" title="显式"></a>显式</h4>
                 
               </div>
             
@@ -305,11 +331,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Bukkit/">#Bukkit</a>
-      
-        <a href="/tags/Gradle/">#Gradle</a>
-      
-        <a href="/tags/Plugin/">#Plugin</a>
+        <a href="/tags/Computer-Graphics/">#Computer Graphics</a>
       
     </div>
   
@@ -321,8 +343,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Bukkit中构建后自动打开服务端</div>
-      <div>http://tt432.github.io/Bukkit中构建后自动打开服务端/</div>
+      <div>图形学梳理</div>
+      <div>http://tt432.github.io/图形学梳理/</div>
     </div>
     <div class="license-meta">
       
@@ -334,7 +356,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年6月27日</div>
+          <div>2023年7月8日</div>
         </div>
       
       
@@ -366,15 +388,21 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/MythicMobsSkill%E7%B3%BB%E7%BB%9F%E6%8B%86%E8%A7%A3/" title="MythicMobsSkill系统拆解">
+                      <a href="/Minecraft%E4%B8%AD%E7%9A%84LightTexture/" title="Minecraft中的LightTexture">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MythicMobsSkill系统拆解</span>
+                        <span class="hidden-mobile">Minecraft中的LightTexture</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/MythicMobsSkill%E7%B3%BB%E7%BB%9F%E6%8B%86%E8%A7%A3/" title="MythicMobsSkill系统拆解">
+                        <span class="hidden-mobile">MythicMobsSkill系统拆解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
