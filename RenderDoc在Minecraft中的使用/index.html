@@ -16,23 +16,27 @@
   <meta name="author" content="秦千久">
   <meta name="keywords" content="">
   
-    <meta name="description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
+    <meta name="description" content="其他人写的教程 可以在 build.gradle 中放置如下内容，将会生成一个名为 runWithRenderDoc 的任务，执行该任务即可。 12345678910111213141516171819202122tasks.register(&quot;runWithRenderDoc&quot;, Exec) &amp;#123;    def javaExecTask &#x3D; tasks.withTyp">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Minecraft中的LightTexture">
-<meta property="og:url" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/">
+<meta property="og:title" content="RenderDoc在Minecraft中的使用">
+<meta property="og:url" content="http://tt432.github.io/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/">
 <meta property="og:site_name" content="千久银窝">
-<meta property="og:description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
+<meta property="og:description" content="其他人写的教程 可以在 build.gradle 中放置如下内容，将会生成一个名为 runWithRenderDoc 的任务，执行该任务即可。 12345678910111213141516171819202122tasks.register(&quot;runWithRenderDoc&quot;, Exec) &amp;#123;    def javaExecTask &#x3D; tasks.withTyp">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png">
-<meta property="article:published_time" content="2023-07-08T09:56:59.000Z">
-<meta property="article:modified_time" content="2024-05-06T10:55:17.655Z">
+<meta property="og:image" content="http://tt432.github.io/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/bd405292b063d527f1c9ad0559680c06.png">
+<meta property="og:image" content="http://tt432.github.io/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/6fb47941a9eb5cd6a148fe8c8aeae5af.png">
+<meta property="article:published_time" content="2024-06-22T14:32:14.000Z">
+<meta property="article:modified_time" content="2024-06-22T14:37:38.401Z">
 <meta property="article:author" content="秦千久">
+<meta property="article:tag" content="render">
+<meta property="article:tag" content="minecraft">
+<meta property="article:tag" content="renderdoc">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png">
+<meta name="twitter:image" content="http://tt432.github.io/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/bd405292b063d527f1c9ad0559680c06.png">
   
   
   
-  <title>Minecraft中的LightTexture - 千久银窝</title>
+  <title>RenderDoc在Minecraft中的使用 - 千久银窝</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -198,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Minecraft中的LightTexture"></span>
+            <span id="subtitle" data-typed-text="RenderDoc在Minecraft中的使用"></span>
           
         </div>
 
@@ -209,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-07-08 17:56" pubdate>
-          2023年7月8日 下午
+        <time datetime="2024-06-22 22:32" pubdate>
+          2024年6月22日 晚上
         </time>
       </span>
     
@@ -221,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          804 字
         
       </span>
     
@@ -232,7 +236,7 @@
         
         
         
-          11 分钟
+          7 分钟
         
       </span>
     
@@ -270,22 +274,16 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Minecraft中的LightTexture</h1>
+            <h1 style="display: none">RenderDoc在Minecraft中的使用</h1>
             
             
               <div class="markdown-body">
                 
-                <p>我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。</p>
-<p>RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？</p>
-<p>2 是光照纹理</p>
-<p>在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影</p>
-<p>可以通过以下方式导出 lightmap：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Mod</span>.EventBusSubscriber(Dist.CLIENT)<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LightTextureDump</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> tick;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">notRender</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<br><br>    <span class="hljs-meta">@SubscribeEvent</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onEvent</span><span class="hljs-params">(RenderLevelStageEvent event)</span> &#123;<br>        <span class="hljs-keyword">if</span> (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL &amp;&amp; tick++ &gt; <span class="hljs-number">100</span> &amp;&amp; notRender) &#123;<br>            notRender = <span class="hljs-literal">false</span>;<br><br>            <span class="hljs-type">AbstractTexture</span> <span class="hljs-variable">lightMap</span> <span class="hljs-operator">=</span> Minecraft.getInstance().getTextureManager()<br>                    .getTexture(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ResourceLocation</span>(String.format(Locale.ROOT, <span class="hljs-string">&quot;dynamic/%s_%d&quot;</span>, <span class="hljs-string">&quot;light_map&quot;</span>, <span class="hljs-number">1</span>)));<br><br>            <span class="hljs-type">NativeImage</span> <span class="hljs-variable">ni</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeImage</span>(<span class="hljs-number">16</span>,<span class="hljs-number">16</span>, <span class="hljs-literal">false</span>);<br>            RenderSystem.bindTexture(lightMap.getId());<br><br>            ni.downloadTexture(<span class="hljs-number">0</span>, <span class="hljs-literal">true</span>);<br><br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-type">FileImageOutputStream</span> <span class="hljs-variable">fios</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileImageOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(<span class="hljs-string">&quot;./lightMap.png&quot;</span>));<br><br>                fios.write(ni.asByteArray());<br><br>                fios.close();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <p><a target="_blank" rel="noopener" href="https://gist.github.com/T3sT3ro/e43b714ee6ca97ec4b0cb65fc606ffac">其他人写的教程</a></p>
+<p>可以在 build.gradle 中放置如下内容，将会生成一个名为 runWithRenderDoc 的任务，执行该任务即可。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs groovy">tasks.register(<span class="hljs-string">&quot;runWithRenderDoc&quot;</span>, Exec) &#123;<br>    <span class="hljs-keyword">def</span> javaExecTask = tasks.withType(JavaExec).named(<span class="hljs-string">&quot;runClient&quot;</span>).get()<br>    <span class="hljs-keyword">def</span> javaHome = javaExecTask.javaLauncher.get().metadata.installationPath.asFile.absolutePath<br><br>    commandLine = [<br>            <span class="hljs-string">&quot;E:\\RenderDoc\\renderdoccmd.exe&quot;</span>,<br>            <span class="hljs-string">&quot;capture&quot;</span>,<br>            <span class="hljs-string">&quot;--opt-hook-children&quot;</span>,<br>            <span class="hljs-string">&quot;--wait-for-exit&quot;</span>,<br>            <span class="hljs-string">&quot;--working-dir&quot;</span>,<br>            <span class="hljs-string">&quot;.&quot;</span>,<br>            <span class="hljs-string">&quot;$javaHome/bin/java.exe&quot;</span>,<br>            <span class="hljs-string">&quot;-Xmx64m&quot;</span>,<br>            <span class="hljs-string">&quot;-Xms64m&quot;</span>,<br>            <span class="hljs-string">&quot;-Dorg.gradle.appname=gradlew&quot;</span>,<br>            <span class="hljs-string">&quot;-Dorg.gradle.java.home=$javaHome&quot;</span>,<br>            <span class="hljs-string">&quot;-classpath&quot;</span>,<br>            <span class="hljs-string">&quot;gradle/wrapper/gradle-wrapper.jar&quot;</span>,<br>            <span class="hljs-string">&quot;org.gradle.wrapper.GradleWrapperMain&quot;</span>,<br>            <span class="hljs-string">&quot;runClient&quot;</span><br>    ]<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>亦或是用 RenderDoc 导出 Sampler2:<br><img src="/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png" srcset="/img/loading.gif" lazyload alt="RenderDoc"></p>
-<p>lightMap 的纹理有 16 x 16，FULL_LIGHT 对应的坐标为 (15,15)。</p>
-<p>因此，若光照大于 FULL_LIGHT，则会出现各种问题，这取决于当前管线的着色器的行为。</p>
-<p>lightMap 的横轴为 block，纵轴为 sky，观察导出的 lightMap 可以看出，在 MC 原版的行为中，若方块光足够强则可以无视天光的影响。</p>
+<p><img src="/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/bd405292b063d527f1c9ad0559680c06.png" srcset="/img/loading.gif" lazyload alt="alt text"><br><img src="/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/6fb47941a9eb5cd6a148fe8c8aeae5af.png" srcset="/img/loading.gif" lazyload alt="alt text"></p>
 
                 
               </div>
@@ -295,6 +293,17 @@
               <div class="post-metas my-3">
   
   
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/render/">#render</a>
+      
+        <a href="/tags/minecraft/">#minecraft</a>
+      
+        <a href="/tags/renderdoc/">#renderdoc</a>
+      
+    </div>
+  
 </div>
 
 
@@ -303,8 +312,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Minecraft中的LightTexture</div>
-      <div>http://tt432.github.io/Minecraft中的LightTexture/</div>
+      <div>RenderDoc在Minecraft中的使用</div>
+      <div>http://tt432.github.io/RenderDoc在Minecraft中的使用/</div>
     </div>
     <div class="license-meta">
       
@@ -316,7 +325,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年7月8日</div>
+          <div>2024年6月22日</div>
         </div>
       
       
@@ -348,18 +357,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E6%8E%A2%E6%8E%A2%E7%B2%BE%E7%A5%9E%E9%9C%80%E6%B1%82%E5%9C%A8%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84%E4%BD%93%E7%8E%B0/" title="探探精神需求在游戏中的体现">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">探探精神需求在游戏中的体现</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E6%A2%B3%E7%90%86/" title="图形学梳理">
-                        <span class="hidden-mobile">图形学梳理</span>
+                      <a href="/%E8%B0%88%E8%B0%88%E4%BB%80%E4%B9%88%E6%98%AF%E6%B8%B8%E6%88%8F%E6%9C%BA%E5%88%B6/" title="谈谈什么是游戏机制">
+                        <span class="hidden-mobile">谈谈什么是游戏机制</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
