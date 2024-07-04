@@ -4,6 +4,29 @@
   
   
   <entry>
+    <title>moj_import</title>
+    <link href="/moj-import/"/>
+    <url>/moj-import/</url>
+    
+    <content type="html"><![CDATA[<p>mojang 对 glsl 的预处理有拓展，位于 <code>com.mojang.blaze3d.preprocessor.GlslPreprocessor</code>，最主要的功能是实现 #moj_import。</p><p>根据默认实现，EffectProgram（后处理着色器使用的着色器程序）无法进行 #moj_import 的操作。</p><p>#moj_import 会匹配 <code>#moj_import &quot;&quot;</code> 或 <code>#moj_import &lt;&gt;</code>（就像是 c 语言的 #include）。</p><p>引号代表使用相对位置。例如，着色器是 <code>shaders/core/abc.glsl</code>，在该着色器内写入 <code>#moj_import &quot;cde.glsl&quot;</code> 会尝试找 <code>shaders/core/cde.glsl</code> 文件。</p><p>尖括号代表绝对位置。例如，着色器是 <code>shaders/core/abc.glsl</code>，在该着色器内写入 <code>#moj_import &lt;cde.glsl&gt;</code> 会尝试找 <code>shaders/include/cde.glsl</code> 文件。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>render</tag>
+      
+      <tag>minecraft</tag>
+      
+      <tag>shader</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>RenderDoc在Minecraft中的使用</title>
     <link href="/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/"/>
     <url>/RenderDoc%E5%9C%A8Minecraft%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
