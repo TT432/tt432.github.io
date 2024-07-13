@@ -16,23 +16,23 @@
   <meta name="author" content="秦千久">
   <meta name="keywords" content="">
   
-    <meta name="description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
+    <meta name="description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 预留的有 12 个，都代表什么呢？ 1 是 OverlayTexture OverlayTexture 是 “覆盖纹理”，负责实体受伤和爬行者爆炸时的效果。 2 是 LightTexture 可以用 RenderDoc 查看 Sampl">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Minecraft中的LightTexture">
-<meta property="og:url" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/">
+<meta property="og:title" content="Minecraft的ShaderTextures">
+<meta property="og:url" content="http://tt432.github.io/Minecraft%E7%9A%84ShaderTextures/">
 <meta property="og:site_name" content="千久银窝">
-<meta property="og:description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021">
+<meta property="og:description" content="我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 预留的有 12 个，都代表什么呢？ 1 是 OverlayTexture OverlayTexture 是 “覆盖纹理”，负责实体受伤和爬行者爆炸时的效果。 2 是 LightTexture 可以用 RenderDoc 查看 Sampl">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png">
+<meta property="og:image" content="http://tt432.github.io/RenderDoc.png">
 <meta property="article:published_time" content="2023-07-08T09:56:59.000Z">
-<meta property="article:modified_time" content="2024-05-06T10:55:17.655Z">
+<meta property="article:modified_time" content="2024-07-13T02:15:31.397Z">
 <meta property="article:author" content="秦千久">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://tt432.github.io/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png">
+<meta name="twitter:image" content="http://tt432.github.io/RenderDoc.png">
   
   
   
-  <title>Minecraft中的LightTexture - 千久银窝</title>
+  <title>Minecraft的ShaderTextures - 千久银窝</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -198,7 +198,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Minecraft中的LightTexture"></span>
+            <span id="subtitle" data-typed-text="Minecraft的ShaderTextures"></span>
           
         </div>
 
@@ -221,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          340 字
         
       </span>
     
@@ -232,7 +232,7 @@
         
         
         
-          11 分钟
+          3 分钟
         
       </span>
     
@@ -270,19 +270,17 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Minecraft中的LightTexture</h1>
+            <h1 style="display: none">Minecraft的ShaderTextures</h1>
             
             
               <div class="markdown-body">
                 
                 <p>我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。</p>
-<p>RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？</p>
-<p>2 是光照纹理</p>
-<p>在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影</p>
-<p>可以通过以下方式导出 lightmap：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Mod</span>.EventBusSubscriber(Dist.CLIENT)<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LightTextureDump</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> tick;<br>    <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">notRender</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<br><br>    <span class="hljs-meta">@SubscribeEvent</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">onEvent</span><span class="hljs-params">(RenderLevelStageEvent event)</span> &#123;<br>        <span class="hljs-keyword">if</span> (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL &amp;&amp; tick++ &gt; <span class="hljs-number">100</span> &amp;&amp; notRender) &#123;<br>            notRender = <span class="hljs-literal">false</span>;<br><br>            <span class="hljs-type">AbstractTexture</span> <span class="hljs-variable">lightMap</span> <span class="hljs-operator">=</span> Minecraft.getInstance().getTextureManager()<br>                    .getTexture(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ResourceLocation</span>(String.format(Locale.ROOT, <span class="hljs-string">&quot;dynamic/%s_%d&quot;</span>, <span class="hljs-string">&quot;light_map&quot;</span>, <span class="hljs-number">1</span>)));<br><br>            <span class="hljs-type">NativeImage</span> <span class="hljs-variable">ni</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">NativeImage</span>(<span class="hljs-number">16</span>,<span class="hljs-number">16</span>, <span class="hljs-literal">false</span>);<br>            RenderSystem.bindTexture(lightMap.getId());<br><br>            ni.downloadTexture(<span class="hljs-number">0</span>, <span class="hljs-literal">true</span>);<br><br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-type">FileImageOutputStream</span> <span class="hljs-variable">fios</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FileImageOutputStream</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(<span class="hljs-string">&quot;./lightMap.png&quot;</span>));<br><br>                fios.write(ni.asByteArray());<br><br>                fios.close();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>亦或是用 RenderDoc 导出 Sampler2:<br><img src="/Minecraft%E4%B8%AD%E7%9A%84LightTexture/RenderDoc.png" srcset="/img/loading.gif" lazyload alt="RenderDoc"></p>
+<p>RenderSystem 中的 shaderTextures 预留的有 12 个，都代表什么呢？</p>
+<p>1 是 OverlayTexture</p>
+<p>OverlayTexture 是 “覆盖纹理”，负责实体受伤和爬行者爆炸时的效果。</p>
+<p>2 是 LightTexture</p>
+<p>可以用 RenderDoc 查看 Sampler2:<br><img src="/RenderDoc.png" srcset="/img/loading.gif" lazyload alt="RenderDoc"></p>
 <p>lightMap 的纹理有 16 x 16，FULL_LIGHT 对应的坐标为 (15,15)。</p>
 <p>因此，若光照大于 FULL_LIGHT，则会出现各种问题，这取决于当前管线的着色器的行为。</p>
 <p>lightMap 的横轴为 block，纵轴为 sky，观察导出的 lightMap 可以看出，在 MC 原版的行为中，若方块光足够强则可以无视天光的影响。</p>
@@ -303,8 +301,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Minecraft中的LightTexture</div>
-      <div>http://tt432.github.io/Minecraft中的LightTexture/</div>
+      <div>Minecraft的ShaderTextures</div>
+      <div>http://tt432.github.io/Minecraft的ShaderTextures/</div>
     </div>
     <div class="license-meta">
       

@@ -413,15 +413,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/Minecraft%E4%B8%AD%E7%9A%84LightTexture/" target="_self">
-          Minecraft中的LightTexture
+        <a href="/Minecraft%E7%9A%84ShaderTextures/" target="_self">
+          Minecraft的ShaderTextures
         </a>
       </h1>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/Minecraft%E4%B8%AD%E7%9A%84LightTexture/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/Minecraft%E7%9A%84ShaderTextures/" target="_self">
         <div>
-          我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 足足有 12 个，都代表什么呢？ 2 是光照纹理 在 MC 原版的片元着色器与顶点着色器中都可以看到 Sampler2 的身影 可以通过以下方式导出 lightmap： 123456789101112131415161718192021
+          我相信部分人接触新版本后，对 setShaderTexture 有很多不解，基本抄原版代码实现功能。 RenderSystem 中的 shaderTextures 预留的有 12 个，都代表什么呢？ 1 是 OverlayTexture OverlayTexture 是 “覆盖纹理”，负责实体受伤和爬行者爆炸时的效果。 2 是 LightTexture 可以用 RenderDoc 查看 Sampl
         </div>
       </a>
 
