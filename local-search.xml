@@ -4,6 +4,27 @@
   
   
   <entry>
+    <title>1.21+NeoForge与Bukkit网络通信</title>
+    <link href="/1-21-NeoForge%E4%B8%8EBukkit%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/"/>
+    <url>/1-21-NeoForge%E4%B8%8EBukkit%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1/</url>
+    
+    <content type="html"><![CDATA[<p>在旧版本 Forge 与 Bukkit 的通信中使用 <code>PluginMessageRecipient</code> 的 <code>sendPluginMessage</code>，新版本 NeoForge 依旧使用该方法。</p><p>与之前不同的是 NeoForge 在<a href="https://neoforged.net/news/20.4networking-rework/">网络更新</a>后使用 payload，使用原版的流程，从以往在数据中填入数字 id 不同，改为在 channel 中填写 payload 的 id，这在 <a href="https://wiki.vg/Plugin_channels">wiki</a> 中也可以找到蛛丝马迹。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Bukkit</tag>
+      
+      <tag>NeoForge</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>moj_import</title>
     <link href="/moj-import/"/>
     <url>/moj-import/</url>
